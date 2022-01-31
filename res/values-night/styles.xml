@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="ToolbarTheme" parent="Theme.MaterialComponents" />
+
+    <style name="MyBaseTheme" parent="Theme.MaterialComponents.NoActionBar">
+        <item name="android:windowNoTitle">true</item>
+        <item name="windowActionBar">false</item>
+    </style>
+
+    <style name="AppTheme" parent="MyBaseTheme">
+        <item name="theme_color">@color/green_night</item>
+        <item name="theme_color_red">@color/red_night</item>
+        <item name="mainBack">@color/main_back_night</item>
+        <item name="myDivider">@android:color/darker_gray</item>
+    </style>
+
+</resources>

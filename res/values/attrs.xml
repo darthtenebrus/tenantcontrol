@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <attr name="theme_color" format="reference" />
+    <attr name="theme_color_red" format="reference" />
+    <attr name="mainBack" format="reference" />
+    <attr name="myDivider" format="reference" />
+</resources>

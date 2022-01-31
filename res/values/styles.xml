@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="ToolbarTheme" parent="Theme.MaterialComponents.Light">
+        <item name="android:textColorPrimary">@android:color/white</item>
+        <item name="colorControlNormal">@android:color/white</item>
+        <item name="android:background">?attr/colorPrimary</item>
+    </style>
+
+    <style name="MyBaseTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <item name="android:windowNoTitle">true</item>
+        <item name="windowActionBar">false</item>
+    </style>
+
+    <style name="AppTheme" parent="MyBaseTheme">
+        <item name="theme_color">@color/green_day</item>
+        <item name="theme_color_red">@color/red_day</item>
+        <item name="mainBack">@color/main_back</item>
+        <item name="myDivider">@android:color/darker_gray</item>
+    </style>
+
+
+</resources>

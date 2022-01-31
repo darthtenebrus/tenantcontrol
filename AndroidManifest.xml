@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+          package="org.android.drtools.tenantcontrol"
+          android:versionCode="1"
+          android:versionName="1.0">
+
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+    <application
+            android:icon="@mipmap/ic_launcher"
+            android:roundIcon="@mipmap/ic_launcher_round"
+            android:label="@string/app_name"
+            android:usesCleartextTraffic="true"
+            android:theme="@style/AppTheme">
+
+        <activity
+                android:label="@string/app_name"
+                android:name="TenantControlActivity"
+                android:launchMode="singleTop"
+                android:configChanges="keyboardHidden|orientation|screenSize"
+                android:networkSecurityConfig="@xml/network_security_config"
+                >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data
+                        android:host="java-lang-programming"
+                        android:scheme="android-app-google-plus-demo" />
+            </intent-filter>
+
+        </activity>
+    </application>
+
+
+</manifest>

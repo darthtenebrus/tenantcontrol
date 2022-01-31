@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory
+            android:title="@string/inline_preferences">
+
+        <EditTextPreference
+                android:icon="@android:drawable/ic_menu_edit"
+                android:title="@string/title_data_url_preference"
+                android:key="url_preference"
+                android:summary="@string/data_url_preference_on"
+                android:defaultValue="http://mc.iqr.su:8080/api/version?tenant=all" />
+        <SwitchPreference
+            android:icon="@android:drawable/ic_menu_today"
+            android:key="pref_schedule_on"
+            android:summary="@string/pref_schedule_on_full"
+            android:title="@string/pref_schedule_on_short"/>
+        <Preference
+                android:icon="@android:drawable/ic_menu_my_calendar"
+                android:key="pref_time_schedule"
+                android:summary="@string/pref_full_auto_check"
+                android:dependency="pref_schedule_on"
+                android:title="@string/pref_auto_check"/>
+    </PreferenceCategory>
+</PreferenceScreen>

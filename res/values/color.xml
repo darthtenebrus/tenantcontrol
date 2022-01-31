@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="green_night">#58c10e</color>
+    <color name="green_day">#245303</color>
+    <color name="red_night">#c1000e</color>
+    <color name="red_day">#910000</color>
+    <color name="main_back">#E7E4E4</color>
+    <color name="main_back_night">#252525</color>
+</resources>
