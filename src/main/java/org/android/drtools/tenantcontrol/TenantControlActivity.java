@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -30,6 +31,7 @@ import com.google.android.material.navigation.NavigationView;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 
 public class TenantControlActivity extends AppCompatActivity implements NavController.OnDestinationChangedListener {
@@ -122,9 +124,12 @@ public class TenantControlActivity extends AppCompatActivity implements NavContr
         boolean scheduleOn = mainPref.getBoolean(SetPrefsFragment.SCHEDULE_ON, false);
         if (scheduleOn) {
             String url = mainPref.getString("url_preference", Commons.TENANT_URL);
-            long time = mainPref.getLong(SetPrefsFragment.TIME_SCHEDULE, Commons.SCHEDULE_TIME);
+            int time = mainPref.getInt(SetPrefsFragment.TIME_SCHEDULE, Commons.SCHEDULE_TIME);
+            Log.i(AbstractSyncTask.TAG, "Seconds = " + time);
+            long delayLong = TimeUnit.MILLISECONDS.convert(time, TimeUnit.SECONDS);
+            Log.i(AbstractSyncTask.TAG, "Milliseconds = " + delayLong);
             BackgroundSyncTask.getInstance()
-                    .execute(url, time, time);
+                    .execute(url, delayLong, delayLong);
         } else {
             BackgroundSyncTask.getInstance().cancelWorker();
         }

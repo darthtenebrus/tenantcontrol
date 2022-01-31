@@ -4,4 +4,10 @@
     <attr name="theme_color_red" format="reference" />
     <attr name="mainBack" format="reference" />
     <attr name="myDivider" format="reference" />
+
+    <declare-styleable name="MyNumberPickerStyleable">
+        <attr name="minValue" format="integer" />
+        <attr name="maxValue" format="integer" />
+        <attr name="wrapWheel" format="boolean" />
+    </declare-styleable>
 </resources>

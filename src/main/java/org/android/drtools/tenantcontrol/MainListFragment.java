@@ -16,6 +16,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class MainListFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
 
@@ -35,11 +36,14 @@ public class MainListFragment extends Fragment implements SwipeRefreshLayout.OnR
                     Log.i(AbstractSyncTask.TAG, "Data received");
                     boolean result = bundle.getBoolean(SetPrefsFragment.SCHEDULE_ON, false);
                     if (result) {
-                        long delay = bundle.getLong(SetPrefsFragment.TIME_SCHEDULE, 0L);
-                        if (0L != delay) {
+                        int delay = bundle.getInt(SetPrefsFragment.TIME_SCHEDULE, 0);
+                        Log.i(AbstractSyncTask.TAG, "Seconds = " + delay);
+                        if (0 != delay) {
+                            long delayLong = TimeUnit.MILLISECONDS.convert(delay, TimeUnit.SECONDS);
+                            Log.i(AbstractSyncTask.TAG, "Milliseconds = " + delayLong);
                             String url = bundle.getString("url_preference", Commons.TENANT_URL);
                             BackgroundSyncTask.getInstance()
-                                    .execute(url, delay, delay);
+                                    .execute(url, delayLong, delayLong);
                         } else {
                             BackgroundSyncTask.getInstance().cancelWorker();
                         }

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+<PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android">
     <PreferenceCategory
             android:title="@string/inline_preferences">
 
@@ -14,11 +15,12 @@
             android:key="pref_schedule_on"
             android:summary="@string/pref_schedule_on_full"
             android:title="@string/pref_schedule_on_short"/>
-        <Preference
+        <org.android.drtools.tenantcontrol.SecondsPickerPreference
                 android:icon="@android:drawable/ic_menu_my_calendar"
                 android:key="pref_time_schedule"
                 android:summary="@string/pref_full_auto_check"
                 android:dependency="pref_schedule_on"
-                android:title="@string/pref_auto_check"/>
+                android:title="@string/pref_auto_check"
+            />
     </PreferenceCategory>
 </PreferenceScreen>
