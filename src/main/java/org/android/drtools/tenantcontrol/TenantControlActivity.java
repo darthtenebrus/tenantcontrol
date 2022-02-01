@@ -26,6 +26,7 @@ import androidx.navigation.NavController;
 import androidx.navigation.NavDestination;
 import androidx.navigation.Navigation;
 import androidx.preference.PreferenceManager;
+import androidx.work.*;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.navigation.NavigationView;
 import org.jetbrains.annotations.NotNull;
@@ -41,8 +42,6 @@ public class TenantControlActivity extends AppCompatActivity implements NavContr
     private ActionBarDrawerToggle mDrawerToggle;
     private NavController navController;
     private View mMainContainer;
-    public static final String CHANNEL_ID = "org.android.drtools.tenantcontrol.notifications";
-
 
 
     @Override
@@ -69,45 +68,6 @@ public class TenantControlActivity extends AppCompatActivity implements NavContr
 
         createNotificationChannel();
 
-        BackgroundSyncTask.getInstance()
-                .setOnProcessListener(data -> {
-
-                    Optional<MyResViewAdapter.DataHolder> opt = data.stream()
-                            .filter(d -> !d.getHostStatus()).findFirst();
-                    String content = null;
-                    if (!opt.isPresent()) {
-                        content = getResources().getString(R.string.all_ok);
-                    } else {
-                        content = String.format(
-                                getResources().getString(R.string.all_not_ok),
-                                opt.get().getHostName());
-                    }
-
-
-                    NotificationCompat.Builder lBuilder = new NotificationCompat.Builder(
-                            getApplicationContext(), CHANNEL_ID);
-                    PendingIntent contentIntent = PendingIntent.getActivity(
-                            getApplicationContext(), 0,
-                            (new Intent(getApplicationContext(), TenantControlActivity.class))
-                                    .setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP), 0);
-
-                    lBuilder.setSmallIcon(R.drawable.ic_stat_cloud_done)
-                            .setContentIntent(contentIntent)
-                            .setContentTitle(getResources().getString(R.string.str_notif))
-                            .setContentText(content)
-                            .setTicker(content)
-                            .setAutoCancel(true)
-                            .setShowWhen(true)
-                            .setCategory(Notification.CATEGORY_EVENT)
-                            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-                            .setDefaults(Notification.DEFAULT_SOUND)
-                            .setOngoing(false);
-                    ((NotificationManager) getSystemService(
-                            Context.NOTIFICATION_SERVICE)).notify(0, lBuilder.build());
-
-
-                });
-
         mMainContainer = mDrawerLayout.findViewById(R.id.main_contain_id);
 
         mDrawerToggle = new MyDrawerToggle(this, mDrawerLayout,
@@ -122,26 +82,36 @@ public class TenantControlActivity extends AppCompatActivity implements NavContr
 
         SharedPreferences mainPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         boolean scheduleOn = mainPref.getBoolean(SetPrefsFragment.SCHEDULE_ON, false);
+        WorkManager wm = WorkManager.getInstance(getApplicationContext());
+        wm.cancelAllWorkByTag("periodic_work");
         if (scheduleOn) {
             String url = mainPref.getString("url_preference", Commons.TENANT_URL);
             int time = mainPref.getInt(SetPrefsFragment.TIME_SCHEDULE, Commons.SCHEDULE_TIME);
-            Log.i(AbstractSyncTask.TAG, "Seconds = " + time);
-            long delayLong = TimeUnit.MILLISECONDS.convert(time, TimeUnit.SECONDS);
-            Log.i(AbstractSyncTask.TAG, "Milliseconds = " + delayLong);
-            BackgroundSyncTask.getInstance()
-                    .execute(url, delayLong, delayLong);
-        } else {
-            BackgroundSyncTask.getInstance().cancelWorker();
+            Log.i(MyWorker.TAG, "Minutes = " + time);
+
+            Data data = new Data.Builder()
+                    .putString(MyWorker.URI, url)
+                    .build();
+            Constraints constraints = new Constraints.Builder()
+                    .setRequiredNetworkType(NetworkType.CONNECTED)
+                    .build();
+
+            PeriodicWorkRequest periodicWorkRequest = new PeriodicWorkRequest.Builder(MyWorker.class, time, TimeUnit.MINUTES)
+                    .addTag("periodic_work")
+                    .setInputData(data)
+                    .setConstraints(constraints)
+                    .setInitialDelay(time, TimeUnit.MINUTES)
+                    .build();
+
+            wm.enqueue(periodicWorkRequest);
         }
-
-
     }
 
     private void createNotificationChannel() {
         CharSequence name = getString(R.string.channel_name);
         String description = getString(R.string.channel_description);
         int importance = NotificationManager.IMPORTANCE_DEFAULT;
-        NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
+        NotificationChannel channel = new NotificationChannel(MyWorker.CHANNEL_ID, name, importance);
         channel.setDescription(description);
         channel.setShowBadge(true);
         channel.enableVibration(true);

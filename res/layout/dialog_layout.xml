@@ -13,7 +13,7 @@
         android:id="@+id/num_picker"
         android:orientation="vertical"
         android:layout_gravity="center"
-        app:minValue="10"
+        app:minValue="16"
         app:maxValue="60"
         app:wrapWheel="true"
         />

@@ -7,25 +7,22 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentResultListener;
 import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
-import com.fasterxml.jackson.databind.JsonNode;
+import androidx.work.*;
 
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public class MainListFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
 
     private SwipeRefreshLayout mSwipeContainer;
-    private DefaultSyncTask mSyncTask = null;
+
     private SharedPreferences mPref;
     private MyResViewAdapter mSmpl;
     private RecyclerView mResListView;
-    private DefaultSyncTask mTask;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -33,22 +30,32 @@ public class MainListFragment extends Fragment implements SwipeRefreshLayout.OnR
         getParentFragmentManager().setFragmentResultListener("settings",
                 this,
                 (key, bundle) -> {
-                    Log.i(AbstractSyncTask.TAG, "Data received");
+                    Log.i(MyWorker.TAG, "Data received");
+                    WorkManager wm = WorkManager.getInstance(getContext().getApplicationContext());
+                    wm.cancelAllWorkByTag("periodic_work");
                     boolean result = bundle.getBoolean(SetPrefsFragment.SCHEDULE_ON, false);
                     if (result) {
                         int delay = bundle.getInt(SetPrefsFragment.TIME_SCHEDULE, 0);
-                        Log.i(AbstractSyncTask.TAG, "Seconds = " + delay);
+                        Log.i(MyWorker.TAG, "Minutes = " + delay);
                         if (0 != delay) {
-                            long delayLong = TimeUnit.MILLISECONDS.convert(delay, TimeUnit.SECONDS);
-                            Log.i(AbstractSyncTask.TAG, "Milliseconds = " + delayLong);
+
                             String url = bundle.getString("url_preference", Commons.TENANT_URL);
-                            BackgroundSyncTask.getInstance()
-                                    .execute(url, delayLong, delayLong);
-                        } else {
-                            BackgroundSyncTask.getInstance().cancelWorker();
+                            Data data = new Data.Builder()
+                                    .putString(MyWorker.URI, url)
+                                    .build();
+                            Constraints constraints = new Constraints.Builder()
+                                    .setRequiredNetworkType(NetworkType.CONNECTED)
+                                    .build();
+
+                            PeriodicWorkRequest periodicWorkRequest = new PeriodicWorkRequest.Builder(MyWorker.class, delay, TimeUnit.MINUTES)
+                                    .addTag("periodic_work")
+                                    .setInputData(data)
+                                    .setConstraints(constraints)
+                                    .setInitialDelay(delay, TimeUnit.MINUTES)
+                                    .build();
+
+                            wm.enqueue(periodicWorkRequest);
                         }
-                    } else {
-                        BackgroundSyncTask.getInstance().cancelWorker();
                     }
         });
     }
@@ -79,16 +86,16 @@ public class MainListFragment extends Fragment implements SwipeRefreshLayout.OnR
             mSwipeContainer.setRefreshing(true);
         }
 
-        mTask = VisualSyncTask.getInstance()
-                        .setOnFinishListener(items -> {
-                            if (mSwipeContainer.isRefreshing()) {
-                                mSwipeContainer.setRefreshing(false);
-                            }
+        DataController.getDataInstance()
+                .observe(getViewLifecycleOwner(), items -> {
+                    if (mSwipeContainer.isRefreshing()) {
+                        mSwipeContainer.setRefreshing(false);
+                    }
 
-                            if (null != items) {
-                                mSmpl.refresh(items);
-                            }
-                        });
+                    if (null != items) {
+                        mSmpl.refresh(items);
+                    }
+                });
 
         doRefresh();
 
@@ -105,13 +112,21 @@ public class MainListFragment extends Fragment implements SwipeRefreshLayout.OnR
         mSwipeContainer = null;
         mSmpl = null;
         mResListView = null;
-        mTask = null;
     }
 
     public void doRefresh() {
         String url = mPref.getString("url_preference", Commons.TENANT_URL);
         if (!"".equals(url)) {
-            mTask.execute(url);
+            Data data = new Data.Builder()
+                    .putString(MyWorker.URI, url)
+                    .build();
+            OneTimeWorkRequest simpleRequest = new OneTimeWorkRequest.Builder(MyWorker.class)
+                    .addTag("simple_work")
+                    .setInputData(data)
+                    .build();
+            WorkManager.getInstance(
+                    getContext().getApplicationContext()
+            ).enqueue(simpleRequest);
         } else {
             if (mSwipeContainer.isRefreshing()) {
                 mSwipeContainer.setRefreshing(false);
