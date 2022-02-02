@@ -38,7 +38,7 @@ public class MyWorker extends Worker {
     public static final String URI = "uri";
     public static final String CHANNEL_ID = "org.android.drtools.tenantcontrol.notifications";
 
-    private static final AtomicInteger counter = new AtomicInteger();
+    private static final AtomicInteger counter = new AtomicInteger(1);
 
     public static int nextValue() {
         return counter.getAndIncrement();
@@ -67,39 +67,44 @@ public class MyWorker extends Worker {
                 }
                 return Result.success();
 
+            } else {
+                sendNotification(null);
+                return Result.failure();
             }
 
         } catch (Exception e) {
             Log.e(TAG, "", e);
         }
+        sendNotification(null);
         return Result.failure();
 
     }
 
     private void sendNotification(List<MyResViewAdapter.DataHolder> data) {
 
-        Optional<MyResViewAdapter.DataHolder> opt = data.stream()
-                .filter(d -> !d.getHostStatus()).findFirst();
-        String content = null;
-        if (!opt.isPresent()) {
-            content = getApplicationContext().getResources().getString(R.string.all_ok);
+        final Context ctx = getApplicationContext();
+        String content;
+        if (null != data) {
+            content = data.stream()
+                    .filter(d -> !d.getHostStatus()).findFirst()
+                    .map(dataHolder -> String.format(
+                            ctx.getResources().getString(R.string.all_not_ok),
+                            dataHolder.getHostName())).orElseGet(() -> ctx.getResources().getString(R.string.all_ok));
         } else {
-            content = String.format(
-                    getApplicationContext().getResources().getString(R.string.all_not_ok),
-                    opt.get().getHostName());
+            content = ctx.getResources().getString(R.string.all_error);
         }
 
 
         NotificationCompat.Builder lBuilder = new NotificationCompat.Builder(
-                getApplicationContext(), CHANNEL_ID);
+                ctx, CHANNEL_ID);
         PendingIntent contentIntent = PendingIntent.getActivity(
-                getApplicationContext(), 0,
-                (new Intent(getApplicationContext(), TenantControlActivity.class))
+                ctx, 0,
+                (new Intent(ctx, TenantControlActivity.class))
                         .setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP), 0);
 
         lBuilder.setSmallIcon(R.drawable.ic_stat_cloud_done)
                 .setContentIntent(contentIntent)
-                .setContentTitle(getApplicationContext().getResources().getString(R.string.str_notif))
+                .setContentTitle(ctx.getResources().getString(R.string.str_notif))
                 .setContentText(content)
                 .setTicker(content)
                 .setAutoCancel(true)
@@ -109,7 +114,7 @@ public class MyWorker extends Worker {
                 .setDefaults(Notification.DEFAULT_SOUND)
                 .setOngoing(false);
         NotificationManagerCompat.from(
-                getApplicationContext()
+                ctx
         ).notify(nextValue(), lBuilder.build());
 
     }

@@ -18,6 +18,7 @@
     <string name="pref_schedule_on_short">Отслеживать тенанты</string>
     <string name="all_ok">Все тенанты в работе</string>
     <string name="all_not_ok">Тенант %s неполадки</string>
+    <string name="all_error">Ошибка обработки тенантов</string>
     <string name="str_notif">Уведомление</string>
 
 </resources>

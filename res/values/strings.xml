@@ -18,6 +18,7 @@
     <string name="pref_schedule_on_short">Watch tenants</string>
     <string name="all_ok">All tenants are operational</string>
     <string name="all_not_ok">Tenant %s not operational</string>
+    <string name="all_error">Error processing tenants</string>
     <string name="str_notif">Notification</string>
 
 
