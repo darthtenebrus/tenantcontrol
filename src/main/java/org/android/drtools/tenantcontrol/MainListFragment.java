@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
 import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -57,7 +58,7 @@ public class MainListFragment extends Fragment implements SwipeRefreshLayout.OnR
                             wm.enqueue(periodicWorkRequest);
                         }
                     }
-        });
+                });
     }
 
     @Override
@@ -88,9 +89,6 @@ public class MainListFragment extends Fragment implements SwipeRefreshLayout.OnR
 
         DataController.getDataInstance()
                 .observe(getViewLifecycleOwner(), items -> {
-                    if (mSwipeContainer.isRefreshing()) {
-                        mSwipeContainer.setRefreshing(false);
-                    }
 
                     if (null != items) {
                         mSmpl.refresh(items);
@@ -124,9 +122,22 @@ public class MainListFragment extends Fragment implements SwipeRefreshLayout.OnR
                     .addTag("simple_work")
                     .setInputData(data)
                     .build();
-            WorkManager.getInstance(
+            WorkManager wm = WorkManager.getInstance(
                     getContext().getApplicationContext()
-            ).enqueue(simpleRequest);
+            );
+            wm.enqueue(simpleRequest);
+            wm.getWorkInfoByIdLiveData(simpleRequest.getId())
+                    .observe(getViewLifecycleOwner(), winfo -> {
+                        WorkInfo.State state = winfo.getState();
+                        if (!WorkInfo.State.RUNNING.equals(state) &&
+                                !WorkInfo.State.ENQUEUED.equals(state) &&
+                                mSwipeContainer.isRefreshing()) {
+                            mSwipeContainer.setRefreshing(false);
+
+                        }
+                    });
+
+
         } else {
             if (mSwipeContainer.isRefreshing()) {
                 mSwipeContainer.setRefreshing(false);

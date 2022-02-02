@@ -54,19 +54,13 @@ public class MyWorker extends Worker {
                 MutableLiveData<List<MyResViewAdapter.DataHolder>> ld = DataController.getDataInstance();
                 if(!ld.hasActiveObservers()) {
                     sendNotification(data);
+                } else {
+                    ld.postValue(data);
                 }
-                ld.postValue(data);
                 return Result.success();
 
             }
 
-        } catch (final IOException e) {
-            Log.e(TAG, "IOException", e);
-
-        } catch (final SAXException e) {
-            Log.e(TAG, "SAXException", e);
-        } catch (final ParseException | RemoteException e) {
-            Log.e(TAG, "ParseException", e);
         } catch (Exception e) {
             Log.e(TAG,"", e);
         }
