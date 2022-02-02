@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.os.RemoteException;
 import android.util.Log;
 import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 import androidx.lifecycle.MutableLiveData;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
@@ -25,6 +26,7 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Created by nazgul on 20.04.15.
@@ -35,6 +37,12 @@ public class MyWorker extends Worker {
     public static final String TAG = "MyWorker";
     public static final String URI = "uri";
     public static final String CHANNEL_ID = "org.android.drtools.tenantcontrol.notifications";
+
+    private static final AtomicInteger counter = new AtomicInteger();
+
+    public static int nextValue() {
+        return counter.getAndIncrement();
+    }
 
     public MyWorker(Context context, WorkerParameters workerParams) {
         super(context, workerParams);
@@ -52,7 +60,7 @@ public class MyWorker extends Worker {
                 List<MyResViewAdapter.DataHolder> data = MyResViewAdapter.parseData(result);
 
                 MutableLiveData<List<MyResViewAdapter.DataHolder>> ld = DataController.getDataInstance();
-                if(!ld.hasActiveObservers()) {
+                if (!ld.hasActiveObservers()) {
                     sendNotification(data);
                 } else {
                     ld.postValue(data);
@@ -62,7 +70,7 @@ public class MyWorker extends Worker {
             }
 
         } catch (Exception e) {
-            Log.e(TAG,"", e);
+            Log.e(TAG, "", e);
         }
         return Result.failure();
 
@@ -100,8 +108,9 @@ public class MyWorker extends Worker {
                 .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                 .setDefaults(Notification.DEFAULT_SOUND)
                 .setOngoing(false);
-        ((NotificationManager) getApplicationContext().getSystemService(
-                Context.NOTIFICATION_SERVICE)).notify(1, lBuilder.build());
+        NotificationManagerCompat.from(
+                getApplicationContext()
+        ).notify(nextValue(), lBuilder.build());
 
     }
 
