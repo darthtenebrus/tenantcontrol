@@ -53,30 +53,22 @@ public class MyWorker extends Worker {
         Log.e(TAG, "Thread started");
 
         String uri = getInputData().getString(URI);
+        MutableLiveData<List<MyResViewAdapter.DataHolder>> ld = DataController.getDataInstance();
+        List<MyResViewAdapter.DataHolder> data = null;
         try {
             JsonNode result = buildJson(uri);
-
             if (null != result) {
-                List<MyResViewAdapter.DataHolder> data = MyResViewAdapter.parseData(result);
-
-                MutableLiveData<List<MyResViewAdapter.DataHolder>> ld = DataController.getDataInstance();
-                if (!ld.hasActiveObservers()) {
-                    sendNotification(data);
-                } else {
-                    ld.postValue(data);
-                }
-                return Result.success();
-
-            } else {
-                sendNotification(null);
-                return Result.failure();
+                data = MyResViewAdapter.parseData(result);
             }
-
         } catch (Exception e) {
             Log.e(TAG, "", e);
         }
-        sendNotification(null);
-        return Result.failure();
+        if (!ld.hasActiveObservers()) {
+            sendNotification(data);
+        } else {
+            ld.postValue(data);
+        }
+        return Result.success();
 
     }
 

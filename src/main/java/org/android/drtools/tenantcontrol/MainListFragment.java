@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.preference.PreferenceManager;
@@ -92,6 +93,10 @@ public class MainListFragment extends Fragment implements SwipeRefreshLayout.OnR
 
                     if (null != items) {
                         mSmpl.refresh(items);
+                    } else {
+                        Toast.makeText(
+                                getContext(), R.string.all_error, Toast.LENGTH_LONG
+                        ).show();
                     }
                 });
 
