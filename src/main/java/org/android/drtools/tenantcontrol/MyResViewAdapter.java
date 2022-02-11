@@ -5,13 +5,28 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.transition.*;
 import com.fasterxml.jackson.databind.JsonNode;
 
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class MyResViewAdapter extends RecyclerView.Adapter<MyResViewAdapter.ViewHolder> {
+public class MyResViewAdapter extends RecyclerView.Adapter<MyResViewAdapter.ViewHolder> implements View.OnClickListener {
+
+    @Override
+    public void onClick(View v) {
+        MyResViewAdapter.ViewHolder h = (MyResViewAdapter.ViewHolder) v.getTag(R.string.all_ok);
+        if (null != h) {
+            TextView btx = h.getBottomText();
+            int vis = btx.getVisibility();
+            TransitionSet set = new AutoTransition();
+            set.setDuration(450);
+
+            TransitionManager.beginDelayedTransition((ViewGroup) v.getRootView(), set);
+            h.getBottomText().setVisibility(vis == View.GONE ? View.VISIBLE : View.GONE);
+        }
+    }
 
     public static class DataHolder {
         private Boolean hostStatus;
@@ -126,6 +141,7 @@ public class MyResViewAdapter extends RecyclerView.Adapter<MyResViewAdapter.View
         Boolean status = dataHolder.getHostStatus();
         View iv = holder.getIv();
         iv.setBackgroundResource(status ? R.drawable.status : R.drawable.status_red);
+        holder.getBottomText().setText(status ? R.string.str_oper : R.string.str_not_oper);
 
 
     }
@@ -141,13 +157,17 @@ public class MyResViewAdapter extends RecyclerView.Adapter<MyResViewAdapter.View
         private final View iv;
         private final TextView itemName;
         private final TextView itemType;
+        private final TextView bottomText;
 
         public ViewHolder(View itemView) {
             super(itemView);
+            itemView.setOnClickListener(MyResViewAdapter.this);
+            itemView.setTag(R.string.all_ok, ViewHolder.this);
             iv = itemView.findViewById(R.id.item_host_status);
             itemName = itemView.findViewById(R.id.item_name_text);
             itemType = itemView.findViewById(R.id.item_type_text);
             itemVersion = itemView.findViewById(R.id.item_version_text);
+            bottomText = itemView.findViewById(R.id.bottom_view);
         }
 
 
@@ -165,6 +185,10 @@ public class MyResViewAdapter extends RecyclerView.Adapter<MyResViewAdapter.View
 
         public TextView getItemVersion() {
             return itemVersion;
+        }
+
+        public TextView getBottomText() {
+            return bottomText;
         }
     }
 }

@@ -20,6 +20,8 @@
     <string name="all_not_ok">Tenant %s not operational</string>
     <string name="all_error">Error processing tenants</string>
     <string name="str_notif">Notification</string>
+    <string name="str_oper">Operational</string>
+    <string name="str_not_oper">Not operational</string>
 
 
 </resources>

@@ -8,7 +8,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
 import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -32,13 +31,11 @@ public class MainListFragment extends Fragment implements SwipeRefreshLayout.OnR
         getParentFragmentManager().setFragmentResultListener("settings",
                 this,
                 (key, bundle) -> {
-                    Log.i(MyWorker.TAG, "Data received");
                     WorkManager wm = WorkManager.getInstance(getContext().getApplicationContext());
                     wm.cancelAllWorkByTag("periodic_work");
                     boolean result = bundle.getBoolean(SetPrefsFragment.SCHEDULE_ON, false);
                     if (result) {
                         int delay = bundle.getInt(SetPrefsFragment.TIME_SCHEDULE, 0);
-                        Log.i(MyWorker.TAG, "Minutes = " + delay);
                         if (0 != delay) {
 
                             String url = bundle.getString("url_preference", Commons.TENANT_URL);

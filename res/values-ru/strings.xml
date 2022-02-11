@@ -20,5 +20,8 @@
     <string name="all_not_ok">Тенант %s неполадки</string>
     <string name="all_error">Ошибка обработки тенантов</string>
     <string name="str_notif">Уведомление</string>
+    <string name="str_oper">В работе</string>
+    <string name="str_not_oper">Не функционирует</string>
+
 
 </resources>
