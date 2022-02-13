@@ -55,7 +55,6 @@
         android:id="@+id/bottom_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="start|center_vertical"
         android:paddingStart="12dp"
         android:paddingBottom="12dp"
         android:visibility="gone"
