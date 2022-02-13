@@ -22,6 +22,7 @@
     <string name="str_notif">Уведомление</string>
     <string name="str_oper">В работе</string>
     <string name="str_not_oper">Не функционирует</string>
-
+    <string name="str_schema">Схема</string>
+    <string name="str_user">Пользователи</string>
 
 </resources>

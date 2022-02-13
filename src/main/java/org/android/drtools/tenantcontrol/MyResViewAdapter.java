@@ -3,6 +3,7 @@ package org.android.drtools.tenantcontrol;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.transition.*;
@@ -18,13 +19,13 @@ public class MyResViewAdapter extends RecyclerView.Adapter<MyResViewAdapter.View
     public void onClick(View v) {
         MyResViewAdapter.ViewHolder h = (MyResViewAdapter.ViewHolder) v.getTag(R.string.all_ok);
         if (null != h) {
-            TextView btx = h.getBottomText();
+            View btx = h.getBottomView();
             int vis = btx.getVisibility();
             Transition set = TransitionInflater.from(v.getContext().getApplicationContext())
                     .inflateTransition(R.transition.main_trans);
 
             TransitionManager.beginDelayedTransition((ViewGroup) v.getRootView(), set);
-            h.getBottomText().setVisibility(vis == View.GONE ? View.VISIBLE : View.GONE);
+            h.getBottomView().setVisibility(vis == View.GONE ? View.VISIBLE : View.GONE);
         }
     }
 
@@ -33,6 +34,9 @@ public class MyResViewAdapter extends RecyclerView.Adapter<MyResViewAdapter.View
         private String hostType;
         private String hostName;
         private String version;
+        private Boolean schemaExists;
+        private Boolean usersExist;
+
 
         public Boolean getHostStatus() {
             return hostStatus;
@@ -64,6 +68,22 @@ public class MyResViewAdapter extends RecyclerView.Adapter<MyResViewAdapter.View
 
         public void setVersion(String version) {
             this.version = version;
+        }
+
+        public Boolean getSchemaExists() {
+            return schemaExists;
+        }
+
+        public void setSchemaExists(Boolean schemaExists) {
+            this.schemaExists = schemaExists;
+        }
+
+        public Boolean getUsersExist() {
+            return usersExist;
+        }
+
+        public void setUsersExist(Boolean usersExist) {
+            this.usersExist = usersExist;
         }
     }
 
@@ -104,6 +124,12 @@ public class MyResViewAdapter extends RecyclerView.Adapter<MyResViewAdapter.View
                             }
                         }
 
+                        dataItem.setUsersExist(attribs.hasNonNull("users") &&
+                                "EXISTS".equalsIgnoreCase(attribs.get("users").asText()));
+
+                        dataItem.setSchemaExists(attribs.hasNonNull("schema_exists") &&
+                                attribs.get("schema_exists").asBoolean());
+
                         if (attribs.hasNonNull("version")) {
                             dataItem.setVersion(attribs.get("version").asText());
                         }
@@ -139,11 +165,25 @@ public class MyResViewAdapter extends RecyclerView.Adapter<MyResViewAdapter.View
         holder.getItemType().setText(dataHolder.getHostType());
         holder.getItemVersion().setText(dataHolder.getVersion());
         Boolean status = dataHolder.getHostStatus();
+        Boolean schema = dataHolder.getSchemaExists();
+        Boolean user = dataHolder.getUsersExist();
+
         View iv = holder.getIv();
         iv.setBackgroundResource(status ? R.drawable.status : R.drawable.status_red);
-        holder.getBottomText().setText(status ? R.string.str_oper : R.string.str_not_oper);
+        TextView txtview = holder.getBottomView()
+                .findViewById(R.id.in_work_view);
+        txtview.setText(status ? R.string.str_oper : R.string.str_not_oper);
+        ImageView imgview = holder.getBottomView()
+                .findViewById(R.id.in_work_image_view);
+        imgview.setImageResource(status ? R.drawable.ic_green : R.drawable.ic_red);
 
+        imgview = holder.getBottomView()
+                .findViewById(R.id.schema_image_view);
+        imgview.setImageResource(schema ? R.drawable.ic_green : R.drawable.ic_red);
 
+        imgview = holder.getBottomView()
+                .findViewById(R.id.user_image_view);
+        imgview.setImageResource(user ? R.drawable.ic_green : R.drawable.ic_red);
     }
 
     @Override
@@ -157,7 +197,7 @@ public class MyResViewAdapter extends RecyclerView.Adapter<MyResViewAdapter.View
         private final View iv;
         private final TextView itemName;
         private final TextView itemType;
-        private final TextView bottomText;
+        private final View bottomView;
 
         public ViewHolder(View itemView) {
             super(itemView);
@@ -167,7 +207,7 @@ public class MyResViewAdapter extends RecyclerView.Adapter<MyResViewAdapter.View
             itemName = itemView.findViewById(R.id.item_name_text);
             itemType = itemView.findViewById(R.id.item_type_text);
             itemVersion = itemView.findViewById(R.id.item_version_text);
-            bottomText = itemView.findViewById(R.id.bottom_view);
+            bottomView = itemView.findViewById(R.id.bottom_view);
         }
 
 
@@ -187,8 +227,8 @@ public class MyResViewAdapter extends RecyclerView.Adapter<MyResViewAdapter.View
             return itemVersion;
         }
 
-        public TextView getBottomText() {
-            return bottomText;
+        public View getBottomView() {
+            return bottomView;
         }
     }
 }

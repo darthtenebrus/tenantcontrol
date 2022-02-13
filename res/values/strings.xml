@@ -22,6 +22,7 @@
     <string name="str_notif">Notification</string>
     <string name="str_oper">Operational</string>
     <string name="str_not_oper">Not operational</string>
-
+    <string name="str_schema">Schema</string>
+    <string name="str_user">Users</string>
 
 </resources>
