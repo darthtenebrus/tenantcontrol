@@ -20,8 +20,8 @@ public class MyResViewAdapter extends RecyclerView.Adapter<MyResViewAdapter.View
         if (null != h) {
             TextView btx = h.getBottomText();
             int vis = btx.getVisibility();
-            TransitionSet set = new AutoTransition();
-            set.setDuration(450);
+            Transition set = TransitionInflater.from(v.getContext().getApplicationContext())
+                    .inflateTransition(R.transition.main_trans);
 
             TransitionManager.beginDelayedTransition((ViewGroup) v.getRootView(), set);
             h.getBottomText().setVisibility(vis == View.GONE ? View.VISIBLE : View.GONE);
